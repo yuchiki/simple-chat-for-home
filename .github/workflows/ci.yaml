@@ -1,7 +1,3 @@
-# CI worlkflow
-# on PR and push to main
-# lint by ESLINT
-
 name: CI
 on:
   pull_request:
