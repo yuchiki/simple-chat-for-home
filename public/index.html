@@ -3,17 +3,15 @@
     <head>
         <meta charset="utf-8">
         <title>伝言板</title>
-        <link rel="stylesheet" href="../css/style.css">
-        <script src="../js/script.js"></script>
+        <script src="script.js"></script>
     </head>
 <body>
     <h1>伝言板</h1>
-    <form id="form">
-        <input type="text" id="name" placeholder="名前">
-        <input type="text" id="message" placeholder="メッセージ">
-        <button type="submit">送信</button>
+    <form id="form" action="/api/v1/messages" method="post" onSubmit="submitHandler(event)">
+            <input type="text" id="name" name="name" placeholder="名前"/>
+            <input type="text" id="message" name="message" placeholder="メッセージ"/>
+            <button type="button" onClick="submitHandler(event)" >送信</button>
     </form>
-    <ul id="messages"></ul>
-    <script src="../js/main.js"></script>
+    <table id="messages"></table>
 </body>
 </html>

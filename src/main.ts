@@ -1,9 +1,11 @@
 // express server
 
 import express from 'express'
+import bodyParser from 'body-parser'
 
 const app = express()
 app.use(express.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 
@@ -15,24 +17,24 @@ const PATHS = {
 }
 
 type Message = {
-  user: string
+  name: string
   datetime: string
   message: string
 }
 
 const messages: Message[] = [
   {
-    user: 'user1',
+    name: 'user1',
     datetime: '2021-08-01T12:00:00',
     message: 'Hello World!',
   },
   {
-    user: 'user2',
+    name: 'user2',
     datetime: '2021-08-01T12:01:00',
     message: 'Hi there!',
   },
   {
-    user: 'user1',
+    name: 'user1',
     datetime: '2021-08-01T12:02:00',
     message: 'How are you?',
   },
@@ -47,10 +49,12 @@ export type PostMessage = {
 }
 
 app.post (PATHS.API_MESSAGES, (req, res) => {
+  console.log('POST /api/v1/messages')
+  console.log(req.body)
   messages.push({
-    user: req.ip ?? 'unknown',
+    name: req.body.name,
     datetime: new Date().toISOString(),
-    message: req.body,
+    message: req.body.message,
   })
   res.send('posted.')
 })
