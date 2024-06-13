@@ -4,6 +4,7 @@ import express from 'express'
 
 const app = express()
 app.use(express.json())
+app.use(express.static('public'))
 app.use(express.urlencoded({ extended: true }))
 
 const port = '3000'
@@ -18,10 +19,6 @@ type Message = {
   datetime: string
   message: string
 }
-
-app.get(PATHS.ROOT, (_, res) => {
-  res.send('Hello World!')
-})
 
 const messages: Message[] = [
   {
@@ -45,7 +42,11 @@ app.get(PATHS.API_MESSAGES, (_, res) => {
   res.send(messages)
 })
 
-app.post(PATHS.API_MESSAGES, (req, res) => {
+export type PostMessage = {
+  message: string
+}
+
+app.post (PATHS.API_MESSAGES, (req, res) => {
   messages.push({
     user: req.ip ?? 'unknown',
     datetime: new Date().toISOString(),
