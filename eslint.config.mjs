@@ -1,7 +1,7 @@
 // @ts-check
 
-import js from '@eslint/js';
-import ts from 'typescript-eslint';
+import js from '@eslint/js'
+import ts from 'typescript-eslint'
 import stylistic from '@stylistic/eslint-plugin'
 
 export default ts.config(
@@ -13,9 +13,9 @@ export default ts.config(
       parserOptions: {
         project: true,
         tsconfigRootDir: import.meta.dirname,
-      }
+      },
     },
 
-    ignores: [ 'node_modules/', 'dist/', 'eslint.config.js']
+    ignores: ['node_modules/', 'dist/', 'eslint.config.js'],
   },
-);
+)
