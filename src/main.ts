@@ -53,7 +53,7 @@ app.post (PATHS.API_MESSAGES, (req, res) => {
   console.log(req.body)
   messages.push({
     name: req.body.name,
-    datetime: new Date().toISOString(),
+    datetime: new Date().toLocaleString('ja-JP'),
     message: req.body.message,
   })
   res.send('posted.')

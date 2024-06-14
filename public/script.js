@@ -1,8 +1,8 @@
 window.onload = async (event) => {
     await fetchMessagesAndRender();
 
-
-  
+    const name = window.localStorage.getItem('name')
+    document.getElementById('name').value = name ?? ''
 }
  
 
@@ -10,16 +10,17 @@ const fetchMessagesAndRender = async () => {
     const response = await fetch('http://localhost:3000/api/v1/messages');
     console.log(response);
     const messages = await response.json();
+
     console.log(messages)
     // index.htmlのmessages-listにメッセージを追加する
     const messagesTable = document.getElementById('messages');
     messagesTable.innerHTML = '';
-    messages.forEach((message) => {
+    messages.reverse().forEach((message) => {
         const row = document.createElement('tr');
 
 
         const datetime = document.createElement('td');
-        datetime.textContent = message.datetime + ":";
+        datetime.textContent = message.datetime;
 
         const name = document.createElement('th');
         name.textContent = message.name;
@@ -47,11 +48,7 @@ const submitHandler = async (e) => {
     const form = document.getElementById('form')
     
     const name = document.getElementById('name').value
-    const message = document.getElementById('message').value
-    
-
-
-    
+    const message = document.getElementById('message').value    
 
     const options = {
         method: 'POST',
@@ -66,4 +63,11 @@ const submitHandler = async (e) => {
 
     fetchMessagesAndRender()
 
+    document.getElementById('message').value = ''
+
+}
+
+const nameOnChangeHandler = (e) => {
+    const name = document.getElementById('name').value
+    window.localStorage.setItem('name', name)
 }

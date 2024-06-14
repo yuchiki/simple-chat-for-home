@@ -7,10 +7,10 @@
     </head>
 <body>
     <h1>伝言板</h1>
+    <input type="text" id="name" name="name" placeholder="名前" onChange="nameOnChangeHandler(event)"/>
+    <hr>
     <form id="form" action="/api/v1/messages" method="post" onSubmit="submitHandler(event)">
-            <input type="text" id="name" name="name" placeholder="名前"/>
             <input type="text" id="message" name="message" placeholder="メッセージ"/>
-            <button type="button" onClick="submitHandler(event)" >送信</button>
     </form>
     <table id="messages"></table>
 </body>
