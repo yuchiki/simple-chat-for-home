@@ -17,23 +17,27 @@ const PATHS = {
 }
 
 type Message = {
+  id: number
   name: string
   datetime: string
   message: string
 }
 
-const messages: Message[] = [
+let messages: Message[] = [
   {
+    id: 0,
     name: 'user1',
     datetime: '2021-08-01T12:00:00',
     message: 'Hello World!',
   },
   {
+    id: 1,
     name: 'user2',
     datetime: '2021-08-01T12:01:00',
     message: 'Hi there!',
   },
   {
+    id: 2,
     name: 'user1',
     datetime: '2021-08-01T12:02:00',
     message: 'How are you?',
@@ -51,12 +55,34 @@ export type PostMessage = {
 app.post (PATHS.API_MESSAGES, (req, res) => {
   console.log('POST /api/v1/messages')
   console.log(req.body)
+
+  const maxId = messages.reduce((acc, cur) => {
+    return acc < cur.id ? cur.id : acc
+  }, -1)
+
   messages.push({
+    id: maxId + 1,
     name: req.body.name,
     datetime: new Date().toLocaleString('ja-JP'),
     message: req.body.message,
   })
   res.send('posted.')
+})
+
+app.delete(PATHS.API_MESSAGES, (req, res) => {
+  // req は ids というキーで削除したい id の配列が送られてくる
+
+  const ids = req.body.ids
+  console.log('DELETE /api/v1/messages')
+  console.log(ids)
+
+  // messages から ids に含まれる id を持つ要素を削除する
+  messages = messages.filter((message) => {
+    console.log(message)
+    return !ids.includes(message.id.toString())
+  })
+
+  res.send('deleted.')
 })
 
 app.listen(port, () => {
