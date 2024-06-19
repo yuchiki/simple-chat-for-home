@@ -4,7 +4,7 @@ window.onload = async (event) => {
     const name = window.localStorage.getItem('name')
     document.getElementById('name').value = name ?? ''
 }
- 
+
 
 const fetchMessagesAndRender = async () => {
     const response = await fetch('http://localhost:3000/api/v1/messages');
@@ -29,7 +29,7 @@ const fetchMessagesAndRender = async () => {
         }
 
         const datetime = document.createElement('td');
-        datetime.textContent = message.datetime;
+        datetime.textContent = new Date(message.date).toLocaleString("ja-JP");
 
         const name = document.createElement('th');
         name.textContent = message.name;
@@ -55,9 +55,9 @@ const submitHandler = async (e) => {
 
 
     const form = document.getElementById('form')
-    
+
     const name = document.getElementById('name').value
-    const message = document.getElementById('message').value    
+    const message = document.getElementById('message').value
 
     const options = {
         method: 'POST',
@@ -84,7 +84,7 @@ const nameOnChangeHandler = (e) => {
 const rowOnClickHandler = (e) => {
     const row = e.target.closest('tr')
     row.classList.toggle('selected')
-    
+
     const checkbox = row.querySelector('input[type="checkbox"]')
     checkbox.checked = !checkbox.checked
 }
@@ -111,6 +111,6 @@ const deleteHandler = async (e) => {
     const res = await fetch(url, options)
 
     fetchMessagesAndRender()
-    
 
-}   
+
+}

@@ -1,89 +1,12 @@
-// express server
-
 import express from 'express'
-import bodyParser from 'body-parser'
+import { registerApiRoutes } from './routes/api.routes'
+const port = '3000'
 
 const app = express()
 app.use(express.json())
-app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.static('public'))
-app.use(express.urlencoded({ extended: true }))
 
-const port = '3000'
-
-const PATHS = {
-  ROOT: '/',
-  API_MESSAGES: '/api/v1/messages',
-}
-
-type Message = {
-  id: number
-  name: string
-  datetime: string
-  message: string
-}
-
-let messages: Message[] = [
-  {
-    id: 0,
-    name: 'user1',
-    datetime: '2021-08-01T12:00:00',
-    message: 'Hello World!',
-  },
-  {
-    id: 1,
-    name: 'user2',
-    datetime: '2021-08-01T12:01:00',
-    message: 'Hi there!',
-  },
-  {
-    id: 2,
-    name: 'user1',
-    datetime: '2021-08-01T12:02:00',
-    message: 'How are you?',
-  },
-]
-
-app.get(PATHS.API_MESSAGES, (_, res) => {
-  res.send(messages)
-})
-
-export type PostMessage = {
-  message: string
-}
-
-app.post (PATHS.API_MESSAGES, (req, res) => {
-  console.log('POST /api/v1/messages')
-  console.log(req.body)
-
-  const maxId = messages.reduce((acc, cur) => {
-    return acc < cur.id ? cur.id : acc
-  }, -1)
-
-  messages.push({
-    id: maxId + 1,
-    name: req.body.name,
-    datetime: new Date().toLocaleString('ja-JP'),
-    message: req.body.message,
-  })
-  res.send('posted.')
-})
-
-app.delete(PATHS.API_MESSAGES, (req, res) => {
-  // req は ids というキーで削除したい id の配列が送られてくる
-
-  const ids = req.body.ids
-  console.log('DELETE /api/v1/messages')
-  console.log(ids)
-
-  // messages から ids に含まれる id を持つ要素を削除する
-  messages = messages.filter((message) => {
-    console.log(message)
-    return !ids.includes(message.id.toString())
-  })
-
-  res.send('deleted.')
-})
+registerApiRoutes(app)
 
 app.listen(port, () => {
   console.log(`listening on port ${port}`)
