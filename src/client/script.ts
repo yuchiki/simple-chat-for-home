@@ -1,113 +1,86 @@
+import { MessageTable } from './components/MessageTable.js'
+import { JSONClient } from './communication/JSONClient.js'
+import { StateManager } from './state/stateManager.js'
+import { ToggleSet } from './util/toggleSet.js'
+
 const MESSAGE_API_URL = 'http://localhost:3000/api/v1/messages'
 
+type Message = { id: string, name: string, message: string, date: string } // TODO: 重複しているのでまとめる
+class IndexPageHTMLElements {
+  nameInput: HTMLInputElement
+  messageInput: HTMLInputElement
+  form: HTMLFormElement
+  deleteButton: HTMLButtonElement
+  messagesTable: MessageTable
+
+  stateManager: StateManager
+
+  constructor(stateManager: StateManager) {
+    this.stateManager = stateManager
+    this.stateManager.registerRender(() => {
+      this.render()
+    })
+    this.nameInput = document.getElementById('name') as HTMLInputElement
+    this.messageInput = document.getElementById('message') as HTMLInputElement
+    this.form = document.getElementById('form') as HTMLFormElement
+    this.deleteButton = document.getElementById('delete') as HTMLButtonElement
+    this.messagesTable = new MessageTable(document.getElementById('messages') as HTMLTableElement, stateManager)
+  }
+
+  registerEventHandlers() {
+    this.form.onsubmit = submitHandler
+    this.deleteButton.onclick = deleteHandler
+    this.nameInput.onchange = nameOnChangeHandler
+    this.messageInput.onchange = messageOnChangeHandler
+  }
+
+  render() {
+    console.log(this.stateManager.state)
+
+    this.messagesTable.render()
+    this.nameInput.value = this.stateManager.state.name
+    this.messageInput.value = this.stateManager.state.message
+  }
+}
+const messageClient = new JSONClient(MESSAGE_API_URL)
+const stateManager = new StateManager()
+
+const htmlElements = new IndexPageHTMLElements(stateManager)
+
 window.onload = async () => {
-  await fetchMessagesAndRender()
+  htmlElements.registerEventHandlers()
+  await fetchMessages()
 
   const name = window.localStorage.getItem('name') ?? ''
-  const nameInput = document.getElementById('name') as HTMLInputElement
-  nameInput.value = name
+  htmlElements.stateManager.updateState({ name: name })
 }
 
-const fetchMessagesAndRender = async () => {
-  const response = await fetch(MESSAGE_API_URL)
-  console.log(response)
-  const messages = await response.json() as { id: string, name: string, message: string, date: string }[]
-
+const fetchMessages = async () => {
+  const messages = await messageClient.get({}) as Message[]
   console.log(messages)
-  // index.htmlのmessages-listにメッセージを追加する
-  const messagesTable = document.getElementById('messages') as HTMLTableElement
-  messagesTable.innerHTML = ''
-  messages.reverse().forEach((message) => {
-    const row = document.createElement('tr')
-    row.dataset['messageId'] = message.id
-    row.onclick = rowOnClickHandler
+  htmlElements.stateManager.updateState({ messages: messages })
+}
 
-    const checkbox = document.createElement('input')
-    checkbox.type = 'checkbox'
-    checkbox.name = 'delete'
-    checkbox.value = message.id
-    checkbox.onclick = (e) => {
-      e.stopPropagation()
-    }
-
-    const datetime = document.createElement('td')
-    datetime.textContent = new Date(message.date).toLocaleString('ja-JP')
-
-    const name = document.createElement('th')
-    name.textContent = message.name
-
-    const mes = document.createElement('td')
-    mes.textContent = message.message
-
-    row.appendChild(checkbox)
-    row.appendChild(datetime)
-    row.appendChild(name)
-    row.appendChild(mes)
-
-    messagesTable.appendChild(row)
-  })
+export const messageOnChangeHandler = () => {
+  htmlElements.stateManager.updateState({ message: htmlElements.messageInput.value })
 }
 
 export const submitHandler = async (e: Event) => {
   e.preventDefault()
   e.stopPropagation()
 
-  const form = document.getElementById('form') as HTMLFormElement
-  const nameInput = document.getElementById('name') as HTMLInputElement
-  const messageInput = document.getElementById('message') as HTMLInputElement
-
-  const name = nameInput.value
-  const message = messageInput.value
-
-  const options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name: name, message: message }),
-  }
-
-  const url = form.getAttribute('action') ?? ''
-  await fetch(url, options)
-
-  await fetchMessagesAndRender()
-
-  messageInput.value = ''
+  await messageClient.post({ name: htmlElements.stateManager.state.name, message: htmlElements.stateManager.state.message })
+  htmlElements.stateManager.updateState({ message: '', selectedRows: new ToggleSet() })
+  await fetchMessages()
 }
 
 export const nameOnChangeHandler = () => {
-  const nameInput = document.getElementById('name') as HTMLInputElement
-  const name = nameInput.value
-  window.localStorage.setItem('name', name)
-}
-
-export const rowOnClickHandler = (e: MouseEvent) => {
-  const row = (e.target as HTMLElement).closest('tr') as HTMLTableRowElement
-  row.classList.toggle('selected')
-
-  const checkbox = row.querySelector('input[type="checkbox"]') as HTMLInputElement
-  checkbox.checked = !checkbox.checked
+  htmlElements.stateManager.updateState({ name: htmlElements.nameInput.value })
+  window.localStorage.setItem('name', htmlElements.stateManager.state.name)
 }
 
 export const deleteHandler = async () => {
-  // チェックされた行を取得
-  const messagesTable = document.getElementById('messages') as HTMLTableElement
-  const rows = messagesTable.querySelectorAll('tr') // チェックされた行には selected クラスが付与されている
-  const checkedRows = Array.from(rows).filter(row => row.classList.contains('selected'))
-
-  // チェックされた行のIDを取得
-  const idsToDelete = checkedRows.map(row => row.dataset['messageId'])
-
-  // 送信
-  const options = {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ ids: idsToDelete }),
-  }
-
-  await fetch(MESSAGE_API_URL, options)
-
-  await fetchMessagesAndRender()
+  await messageClient.delete({ ids: [...htmlElements.stateManager.state.selectedRows] })
+  htmlElements.stateManager.updateState({ selectedRows: new ToggleSet() })
+  await fetchMessages()
 }

@@ -42,7 +42,7 @@ const postMessage: RequestHandler<ParamsDictionary, string, PostMessageBody> = (
     message: body.message,
   })
 
-  res.send('posted.')
+  res.json('posted.')
 }
 
 type DeleteMessagesBody = {
@@ -75,7 +75,7 @@ const deleteMessages: RequestHandler<ParamsDictionary, unknown, DeleteMessagesBo
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     console.log(errors)
-    res.status(400).send('Bad Request')
+    res.status(400).json('Bad Request')
     return
   }
 
@@ -83,7 +83,7 @@ const deleteMessages: RequestHandler<ParamsDictionary, unknown, DeleteMessagesBo
 
   Message.deleteMessages(body.ids)
 
-  res.send('deleted.')
+  res.json('deleted.')
 }
 
 export const getMessagesHandlers = [getMessages]

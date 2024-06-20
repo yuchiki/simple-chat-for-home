@@ -3,18 +3,18 @@
     <head>
         <meta charset="utf-8">
         <title>伝言板</title>
-        <script src="js/script.js"></script>
+        <script type="module" src="js/script.js"></script>
         <link rel="stylesheet" href="style.css">
     </head>
 <body>
     <h1>伝言板</h1>
-    <form id="form" action="/api/v1/messages" method="post" onSubmit="submitHandler(event)">
+    <form id="form" action="/api/v1/messages" method="post">
             <input type="text" id="message" name="message" placeholder="メッセージ"/>
     </form>
     <table id="messages"></table>
 
-    <input type="button", id="delete", value="チェックしたメッセージを削除する", onClick="deleteHandler()"/>
+    <input type="button", id="delete", value="チェックしたメッセージを削除する"/>
     <hr>
-    <input type="text" id="name" name="name" placeholder="名前" onChange="nameOnChangeHandler(event)"/>
+    <input type="text" id="name" name="name" placeholder="名前"/>
 </body>
 </html>
