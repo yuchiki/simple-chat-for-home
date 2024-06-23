@@ -1,7 +1,8 @@
-name: CI
+name: build
 on:
-  tag:
-    - "v*"
+  push:
+    tags:
+      - "v*"
 
 jobs:
   pack_backend:
