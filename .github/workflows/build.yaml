@@ -12,23 +12,25 @@ jobs:
       contents: read
     steps:
       # AWS 認証
+      - name: get tag name
+        run: echo "TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: "ap-northeast-1" # リージョンを指定
+          aws-region: "us-east-1" # リージョンを指定
           role-to-assume: "arn:aws:iam::714992848690:role/simple-chat-for-home-repository-push-role"
       - name: Login to Amazon ECR
         id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           registry-type: public
-        uses: aws-actions/amazon-ecr-login@v2
       - uses: actions/checkout@v3
       - name: build and push docker image to ecr
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REGISTRY_ALIAS: i2c5f4g8
           REPOSITORY: simple-chat-for-home
-          IMAGE_TAG: ${{ GITHUB_REF#refs/*/ }}
+          IMAGE_TAG: ${{ env.TAG_NAME }}
         run: |
           docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
