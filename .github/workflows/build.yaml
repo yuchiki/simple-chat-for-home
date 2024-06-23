@@ -26,8 +26,8 @@ jobs:
         id: build-image
         env:
           REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-          REGISTRY_ALIAS: simple-chat-for-home
-          REPOSITORY: ${{ secrets.ECR_REPO }}
+          REGISTRY_ALIAS: yuchiki
+          REPOSITORY: simple-chat-for-home
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
