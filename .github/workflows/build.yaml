@@ -12,6 +12,8 @@ jobs:
       contents: read
     steps:
       # AWS 認証
+      - name: get tag name
+        run: echo "TAG_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -28,7 +30,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REGISTRY_ALIAS: i2c5f4g8
           REPOSITORY: simple-chat-for-home
-          IMAGE_TAG: ${{ GITHUB_REF#refs/*/ }}
+          IMAGE_TAG: ${{ env.TAG_NAME }}
         run: |
           docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
