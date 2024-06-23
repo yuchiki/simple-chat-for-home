@@ -17,7 +17,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: "ap-northeast-1" # リージョンを指定
+          aws-region: "us-east-1" # リージョンを指定
           role-to-assume: "arn:aws:iam::714992848690:role/simple-chat-for-home-repository-push-role"
       - name: Login to Amazon ECR
         id: login-ecr
