@@ -21,9 +21,9 @@ jobs:
           role-to-assume: "arn:aws:iam::714992848690:role/simple-chat-for-home-repository-push-role"
       - name: Login to Amazon ECR
         id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           registry-type: public
-        uses: aws-actions/amazon-ecr-login@v2
       - uses: actions/checkout@v3
       - name: build and push docker image to ecr
         env:
