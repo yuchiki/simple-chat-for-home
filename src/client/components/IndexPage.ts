@@ -1,7 +1,7 @@
 import { MessageTable } from './../components/MessageTable.js'
-import { JSONClient } from './../communication/JSONClient.js'
+import { MessageClient } from './../communication/MessageClient.js'
 import { StateManager } from './../state/stateManager.js'
-import { ToggleSet } from './../util/toggleSet.js'
+import { ToggleSet } from '../util/toggleSet.js'
 
 type Message = { id: string, name: string, message: string, date: string } // TODO: 重複しているのでまとめる
 export class IndexPageHTMLElements {
@@ -12,9 +12,9 @@ export class IndexPageHTMLElements {
   messagesTable: MessageTable
 
   stateManager: StateManager
-  messageClient: JSONClient
+  messageClient: MessageClient
 
-  constructor(stateManager: StateManager, messageClient: JSONClient) {
+  constructor(stateManager: StateManager, messageClient: MessageClient) {
     this.stateManager = stateManager
     this.messageClient = messageClient
     this.stateManager.registerRender(() => {

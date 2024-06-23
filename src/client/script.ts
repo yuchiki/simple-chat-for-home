@@ -1,10 +1,10 @@
-import { JSONClient } from './communication/JSONClient.js'
 import { StateManager } from './state/stateManager.js'
+import { messageClient } from './communication/MessageClient.js'
 
 import { IndexPageHTMLElements } from './components/IndexPage.js'
 
-const MESSAGE_API_URL = `${window.location.protocol}/api/v1/messages`
 
+const MESSAGE_API_URL = `${window.location.protocol}/api/v1/messages`
 const messageClient = new JSONClient(MESSAGE_API_URL)
 const stateManager = new StateManager()
 
