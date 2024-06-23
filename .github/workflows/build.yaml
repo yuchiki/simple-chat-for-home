@@ -1,9 +1,7 @@
 name: CI
 on:
-  pull_request:
-  push:
-    branches:
-      - main
+  tag:
+    - 'v*'
 
 jobs:
   pack_backend:
@@ -26,7 +24,7 @@ jobs:
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: simple-chat-for-home
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ GITHUB_REF#refs/*/ }}
         run: |
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
