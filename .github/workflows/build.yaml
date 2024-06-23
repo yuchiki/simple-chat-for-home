@@ -18,18 +18,16 @@ jobs:
         with:
           aws-region: 'ap-northeast-1' # リージョンを指定
           role-to-assume: 'arn:aws:iam::714992848690:role/simple-chat-for-home-repository-push-role'
-      - uses: aws-actions/amazon-ecr-login@v2
-        with:
-          registry-type: public
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
       - uses: actions/checkout@v3
       - name: build and push docker image to ecr
-        id: build-image
         env:
-          REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}
-          REGISTRY_ALIAS: yuchiki
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: simple-chat-for-home
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG .
-          docker push $REGISTRY/$REGISTRY_ALIAS/$REPOSITORY:$IMAGE_TAG
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           echo "image=${{env.REPOSITORY}}:${{env.IMAGE_TAG}}" >> $GITHUB_OUTPUT
