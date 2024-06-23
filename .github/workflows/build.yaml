@@ -1,0 +1,36 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  pack_backend:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      # AWS 認証
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: "true"
+          registry-type: public
+        id: login-ecr
+      - uses: actions/checkout@v3
+      - name: build and push docker image to ecr
+        id: build-image
+        env:
+          REPOSITORY: ${{ secrets.BACKEND_REPO }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build  --tag ${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }} simple-chat
+          docker push ${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+          echo "image=${{env.REPOSITORY}}:${{env.IMAGE_TAG}}" >> $GITHUB_OUTPUT
